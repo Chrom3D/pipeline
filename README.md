@@ -77,13 +77,15 @@ bash make_intrachr_rawObserved.sh [chromSizeFile] [intermediateBedpe]
 
 #### Create inter-chromosomal contact matrices
 ```
+python conv_hicpro_mat.py sample_1000000.matrix sample_1000000_abs.bed > sample_1000000.intermediate.bedpe
+
 mkdir inter_chr_RAWobserved 
 
 # Example for inter-chromosome contact between chr1 and chr2:
-awk '{if($1=="chr1" && $4=="chr2") print $2 "\t" $5 "\t" $7}' sample_50000.intermediate.bedpe > inter_chr_RAWobserved/chr1_2_1mb.RAWobserved
+awk '{if($1=="chr1" && $4=="chr2") print $2 "\t" $5 "\t" $7}' sample_1000000.intermediate.bedpe > inter_chr_RAWobserved/chr1_2_1mb.RAWobserved
 
 #Run the following automated script
-bash make_interchr_rawObserved.sh chrom.sizes.sorted sample_50000.intermediate.bedpe
+bash make_interchr_rawObserved.sh chrom.sizes.sorted sample_1000000.intermediate.bedpe
 
 DESCRIPTION:
 bash make_interchr_rawObserved.sh [chromSizeFile] [intermediateBedpe]
