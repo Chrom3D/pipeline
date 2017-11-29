@@ -30,7 +30,7 @@ We assume that the user already have following data to run the pipeline:
 	- We recommend 50kb resolution for the intra-chromosomal contact matrices and 1mb resolution for the inter-chromosomal contact matrices 
 * Topologically Associating Domains (TADs) BED file (created using any TAD callers)
 	- In this pipeline, we assume that the user has defined TADs using the Arrowhead algorithm 
-* Necessary [scripts]() (<-- the link to Download)
+* Necessary [scripts](https://github.com/Chrom3D/preprocess_scripts) (<-- the link to Download)
 * Unmappable blacklist BED file (User can find the unmappable_blacklist.bed for the hg19 assembly in the scripts folder)
 * Chromosomes size file (hg19.chrom.sizes.sorted in the scripts folder)
 
