@@ -38,8 +38,8 @@ We assume that the user already have following data to run the pipeline:
 
 * Lamin associated domains (LAD) BED file
 
---
---
+---
+---
 
 
 ## Main steps
@@ -52,7 +52,7 @@ The sample\_50000.matrix and sample\_50000\_abs.bed can be found in the HiC-Pro 
 
 Example: USER\_WD/hic_results/matrix/sample/raw/50000
 
-We recommend to copy these files to the "script" folder.
+We recommend to copy these files to the "preprocess_scripts" folder.
 
 `
 python conv_hicpro_mat.py sample_50000.matrix sample_50000_abs.bed > sample_50000.intermediate.bedpe
@@ -93,7 +93,7 @@ bash make_interchr_rawObserved.sh [chromSizeFile] [intermediateBedpe]
 [chromSizeFile] A text file containing the chromosome sizes (sorted numerically)
 [intermediateBedpe] An intermediate bedpe created using "conv_hicpro_mat.py"
 ```
---
+---
 
 ### Aggregation of Hi-C contact counts for all pairs of TADs
 
@@ -129,6 +129,7 @@ bash intrachr_NCHG_input_auto.sh sample_Arrowhead_domainlist chrom.sizes.sorted 
 
 DESCRIPTION:bash intrachr_NCHG_input_auto.sh [domainBase] [chromSizeFile] [resolution][domainBase] Basename of the domain files[chromSizeFile] Text file containing the chromosome sizes (sorted numerically)[resolution] Resolution of the interaction matrix as given in the matrix filename (eg. 50kb or 1mb)```
 **(iv) Concatenate all the bedpe files**
+
 `cat intrachr_bedpe/chr*.bedpe > intrachr_bedpe/sample_50kb.domain.RAW.bedpe`
 
 **(v) Remove domains that contain centromeres from the BEDPE file**
@@ -136,7 +137,9 @@ DESCRIPTION:bash intrachr_NCHG_input_auto.sh [domainBase] [chromSizeFile] [reso
 ```
 curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz" | gunzip -c | grep acen | pairToBed -a intrachr_bedpe/sample_50kb.domain.RAW.bedpe -b stdin -type neither > intrachr_bedpe/sample_50kb.domain.RAW.no_cen.bedpe
 ```
---
+
+---
+
 ###Identification of significant intra-chromosomal interaction
 **(i) Calculate the P-value and odds ratio for each pair of TADs**
 
@@ -150,7 +153,7 @@ NCHG -m 50000 -p intrachr_bedpe/sample_50kb.domain.RAW.no_cen.bedpe > sample_50k
 ```
 python NCHG_fdr_oddratio_calc.py sample_50kb.domain.RAW.no_cen.NCHG.out fdr_bh 2 0.01 > sample_50kb.domain.RAW.no_cen.NCHG.sigDESCRIPTION:python NCHG_fdr_oddratio_calc.py [inputFile] [testMethod] [cutoff] [threshold][inputFile] Input filename (NCHG output; BEDPE format)[testMethod] Multiple hypothesis testing method (bonferroni, sidak, holm-sidak, holm, simes-hochberg, hommel, fdr_bh, fdr_by, fdr_tsbh, fdr_tsbky)[cutoff] Odds ratio cutoff value[threshold] Significance threshold value after multiple testing correction```
 
---
+---
 
 ### Create the Model Setup File (GTrack)
 
@@ -203,7 +206,7 @@ python make_diploid_gtrack.py sample_inter_intra_chr_w_LADs.gtrack > sample_inte
 [inputFile] Input GTrack file with constraints specified for single chromosomes[outputFile] Output GTrack file with constraints for each chromosome copy
 ```
 
---
+---
 
 ### Run Chrom3D to generate 3D genome models
 
@@ -212,7 +215,7 @@ Chrom3D -y 0.15 -r 5.0 -n 2000000 -o sample_inter_intra_chr_w_LADs.diploid.cmm s
 -y Scale total volume of the model beads relative to the volume of the nucleus
 -r Radius of the nucleus in micrometers-n Number of iterations-o Output filename[setupFile] Model Setup File in GTrack format
 ```
---
+---
 
 ### Visualisation of 3D genome models using chimera
 
