@@ -1,4 +1,4 @@
-# Pipeline to create the input Model Setup File (GTrack) from the Hi-C data
+# Pipeline to create the input [Model Setup File (GTrack)]() from the Hi-C data
 #### In this pipeline we will explain how to use Hi-C and Lamin ChIP-Seq data (optional) to create the Model Setup File (GTrack) as an input to the Chrom3D to model genome in 3 dimensions. 
 
 ## Preliminary steps and requirements
@@ -58,7 +58,12 @@ We recommend to copy these files to the "preprocess_scripts" folder.
 python conv_hicpro_mat.py sample_50000.matrix sample_50000_abs.bed > sample_50000.intermediate.bedpe
 `
 
+The script "conv\_hicpro\_mat.py" converts the HiC-Pro COO matrix output to the intermediate BEDPE format file.  
+
 #### Create intra-chromosomal contact matrices
+
+This step creates intra-chromosomal RAW observed contact matrices for each chromosome using the BEDPE file created above at 50kb resolution.   
+
 ```
 mkdir intra_chr_RAWobserved
  
@@ -76,6 +81,9 @@ bash make_intrachr_rawObserved.sh [chromSizeFile] [intermediateBedpe]
 ```
 
 #### Create inter-chromosomal contact matrices
+
+This step creates inter-chromosomal RAW observed contact matrices for each pair of chromosomes at 1mb resolution.
+
 ```
 python conv_hicpro_mat.py sample_1000000.matrix sample_1000000_abs.bed > sample_1000000.intermediate.bedpe
 
@@ -141,6 +149,9 @@ curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz
 ---
 
 ###Identification of significant intra-chromosomal interaction
+
+This step uses a non-central hypergeometric test to calclate P-value and odds ratio for each TAD-TAD interactions. Then, the significant TAD-TAD interactions are filtered using FDR and odds ratio.
+
 **(i) Calculate the P-value and odds ratio for each pair of TADs**
 
 ```
@@ -155,9 +166,12 @@ python NCHG_fdr_oddratio_calc.py sample_50kb.domain.RAW.no_cen.NCHG.out fdr_bh 2
 
 ---
 
-### Create the Model Setup File (GTrack)
+### Create the Model Setup File [(GTrack)]()
+
+A Model Setup File (GTrack) is the input file to the Chrom3D which specifies the genomic coordinates, unique id and constraints for the beads. Users can add HiC constraints (TAD-TAD interactions in a chromosome and between chromosomes) using the "edge" column and if the lamin ChIP-Seq data is available, the LAD constraints (beads constrain towards nuclear periphery) using the "periphery" column can be added. A simple illustration of a GTrack file could be found at [the end of the this tutorial](). This step involves creating and adding constraints using HiC data and lamin ChIP-Seq data to a GTrack file. 
 
 **(i) Create GTrack using significant interactions**
+
 
 ```
 bash make_gtrack.sh sample_50kb.domain.RAW.no_cen.NCHG.sig sample_Arrowhead_domainlist.domains sample_intra_chromosome.gtrack
@@ -167,6 +181,8 @@ bash make_gtrack.sh sample_50kb.domain.RAW.no_cen.NCHG.sig sample_Arrowhead_doma
 ```
 
 **(ii) Add LAD information to the GTrack (OPTIONAL)**
+
+This step will add the periphery column to the GTrack file (specifying beads with periphery constrains). Please refer the [illustration]().    
 
 ```
 bash make_gtrack_incl_lad.sh sample_intra_chromosome.gtrack sample_LAD.bed sample_intra_chromosome_w_LADs.gtrackDESCRIPTION:bash make_gtrack_incl_lad.sh [inputFile] [ladFile] [outputFile][inputFile] Input GTrack file (without LAD information)[ladFile] LAD BED file to be added to GTrack file[outputFile] Output GTrack file with LAD information added 
@@ -194,11 +210,14 @@ python NCHG_fdr_oddratio_calc.py sample_1mb_inter_chr.NCHG.out fdr_bh 2 0.01 > s
 
 **(vi) Add significant inter-chromosomal interaction information to the GTrack**
 
+This step adds siginificant inter-chromosomal interaction to the edge column of the Gtrack file. 
+
 ```
 bash add_inter_chrom_beads.sh sample_intra_chromosome_w_LADs.gtrack sample_1mb_inter_chr.NCHG.sig sample_inter_intra_chr_w_LADs.gtrackDESCRIPTION:bash add_inter_chrom_beads.sh [inputFile] [sigFile] [outFile][inputFile] Input GTrack file[sigFile] Inter-chromosome significant interaction file[outFile] Output GTrack file containing significant inter-chromosomal interactions
 ```
 
 **(vii) Modify the Model Setup File to make a diploid model**
+
 
 ```
 python make_diploid_gtrack.py sample_inter_intra_chr_w_LADs.gtrack > sample_inter_intra_chr_w_LADs.diploid.gtrack
@@ -224,6 +243,7 @@ chimera sample_inter_intra_chr_w_LADs.diploid.cmm`
 
 **Highlighting LAD-containing beads**
 
+
 ```
 python color_beads.py sample_inter_intra_chr_w_LADs.diploid.cmm lad_ad04.ids 0,0,255 override > sample_inter_intra_chr_w_LADs.diploid.visLAD.cmmDESCRIPTION:python color_beads.py [inputFile] [beadIdFile] [color] [colorScheme][inputFile] Input CMM file[beadIdFile] File containing selected bead ids[color] Comma-separated RGB value[colorScheme] ‘blend’ or ‘override’ color of the beads specified 
 ```
@@ -239,5 +259,9 @@ python color_beads.py sample_inter_intra_chr_w_LADs.diploid.visLAD.cmm TAD_inter
 
 chimera sample_inter_intra_chr_w_LADs.diploid.visLADCons.cmm
 ```
+
+##Simple illustration of a Model Setup File 
+
+![Example GTrack](http://folk.uio.no/tmali/git_ups/gtrack_illust.png)
 
 
