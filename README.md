@@ -162,7 +162,7 @@ curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz
 
 ---
 
-###Identification of significant intra-chromosomal interaction
+### Identification of significant intra-chromosomal interaction
 
 This step uses a non-central hypergeometric test to calclate P-value and odds ratio for each TAD-TAD interactions. Then, the significant TAD-TAD interactions are filtered using FDR and odds ratio.
 
