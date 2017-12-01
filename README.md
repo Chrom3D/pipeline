@@ -1,4 +1,4 @@
-# Pipeline to create the input [Model Setup File (GTrack)]() from the Hi-C data
+# Pipeline to create the input [Model Setup File (GTrack)](https://github.com/Chrom3D/pipeline/blob/master/README.md#simple-illustration-of-a-model-setup-file) from the Hi-C data
 #### In this pipeline we will explain how to use Hi-C and Lamin ChIP-Seq data (optional) to create the Model Setup File (GTrack) as an input to the Chrom3D to model genome in 3 dimensions. 
 
 ## Preliminary steps and requirements
@@ -195,9 +195,9 @@ python NCHG_fdr_oddratio_calc.py [inputFile] [testMethod] [cutoff] [threshold]
 
 ---
 
-### Create the Model Setup File [(GTrack)]()
+### Create the Model Setup File [(GTrack)](https://github.com/Chrom3D/pipeline/blob/master/README.md#simple-illustration-of-a-model-setup-file)
 
-A Model Setup File (GTrack) is the input file to the Chrom3D which specifies the genomic coordinates, unique id and constraints for the beads. Users can add HiC constraints (TAD-TAD interactions in a chromosome and between chromosomes) using the "edge" column and if the lamin ChIP-Seq data is available, the LAD constraints (beads constrain towards nuclear periphery) using the "periphery" column can be added. A simple illustration of a GTrack file could be found at [the end of the this tutorial](). This step involves creating and adding constraints using HiC data and lamin ChIP-Seq data to a GTrack file. 
+A Model Setup File (GTrack) is the input file to the Chrom3D which specifies the genomic coordinates, unique id and constraints for the beads. Users can add HiC constraints (TAD-TAD interactions in a chromosome and between chromosomes) using the "edge" column and if the lamin ChIP-Seq data is available, the LAD constraints (beads constrain towards nuclear periphery) using the "periphery" column can be added. A simple illustration of a GTrack file could be found at [the end of the this tutorial](https://github.com/Chrom3D/pipeline/blob/master/README.md#simple-illustration-of-a-model-setup-file). This step involves creating and adding constraints using HiC data and lamin ChIP-Seq data to a GTrack file. 
 
 **(i) Create GTrack using significant interactions**
 
@@ -216,7 +216,7 @@ bash make_gtrack.sh [sigFile] [domainFile] [outputFile]
 
 **(ii) Add LAD information to the GTrack (OPTIONAL)**
 
-This step will add the periphery column to the GTrack file (specifying beads with periphery constrains). Please refer the [illustration]().    
+This step will add the periphery column to the GTrack file (specifying beads with periphery constrains). Please refer the [illustration](https://github.com/Chrom3D/pipeline/blob/master/README.md#simple-illustration-of-a-model-setup-file).    
 
 ```
 bash make_gtrack_incl_lad.sh sample_intra_chromosome.gtrack sample_LAD.bed sample_intra_chromosome_w_LADs.gtrack
