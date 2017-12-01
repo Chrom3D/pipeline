@@ -16,6 +16,7 @@
 * [Chimera](https://www.cgl.ucsf.edu/chimera/download.html)
 
 ## To install NCHG
+
 ```
 curl -O http://folk.uio.no/jonaspau/hic/NCHG_hic.zip
 unzip NCHG_hic.zip
@@ -23,6 +24,7 @@ cd NCHG_hic
 make
 export PATH=$PATH:${PWD}
 ```
+
 ## Hi-C data analysis
 
 * We recommend to use the [HiC-Pro](https://github.com/nservant/HiC-Pro) for the initial processes of Hi-C data (mapping and creating Hi-C matrix) as this output (Hi-C matrix in COO format) will serve as the input to this pipeline
@@ -350,7 +352,7 @@ chimera sample_inter_intra_chr_w_LADs.diploid.visLADCons.cmm
 ```
 
 
-##Simple illustration of a Model Setup File 
+## Simple illustration of a Model Setup File 
 
 
 ![Example GTrack](http://folk.uio.no/tmali/git_ups/gtrack_illust.png)
