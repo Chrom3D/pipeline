@@ -16,7 +16,12 @@
 * [Chimera](https://www.cgl.ucsf.edu/chimera/download.html)
 
 ## To install NCHG
-```curl -O http://folk.uio.no/jonaspau/hic/NCHG_hic.zipunzip NCHG_hic.zipcd NCHG_hicmakeexport PATH=$PATH:${PWD}
+```
+curl -O http://folk.uio.no/jonaspau/hic/NCHG_hic.zip
+unzip NCHG_hic.zip
+cd NCHG_hic
+make
+export PATH=$PATH:${PWD}
 ```
 ## Hi-C data analysis
 
@@ -135,7 +140,14 @@ Run the following script to run the above command for all chromosomes
 ```
 bash intrachr_NCHG_input_auto.sh sample_Arrowhead_domainlist chrom.sizes.sorted 50kb
 
-DESCRIPTION:bash intrachr_NCHG_input_auto.sh [domainBase] [chromSizeFile] [resolution][domainBase] Basename of the domain files[chromSizeFile] Text file containing the chromosome sizes (sorted numerically)[resolution] Resolution of the interaction matrix as given in the matrix filename (eg. 50kb or 1mb)```
+DESCRIPTION:
+bash intrachr_NCHG_input_auto.sh [domainBase] [chromSizeFile] [resolution]
+
+[domainBase] Basename of the domain files
+[chromSizeFile] Text file containing the chromosome sizes (sorted numerically)
+[resolution] Resolution of the interaction matrix as given in the matrix filename (eg. 50kb or 1mb)
+
+```
 **(iv) Concatenate all the bedpe files**
 
 `cat intrachr_bedpe/chr*.bedpe > intrachr_bedpe/sample_50kb.domain.RAW.bedpe`
@@ -156,13 +168,28 @@ This step uses a non-central hypergeometric test to calclate P-value and odds ra
 
 ```
 NCHG -m 50000 -p intrachr_bedpe/sample_50kb.domain.RAW.no_cen.bedpe > sample_50kb.domain.RAW.no_cen.NCHG.out
-DESCRIPTION:NCHG -m [minDistance] -p [NULL] [inputFile]-m Minimum genomic distance (in bp) allowed between domains, below which interactions are excluded-p Print output to stdout[inputFile] Hi-C contact count data in BEDPE format
+
+DESCRIPTION:
+NCHG -m [minDistance] -p [NULL] [inputFile]
+
+-m Minimum genomic distance (in bp) allowed between domains, below which interactions are excluded
+-p Print output to stdout
+[inputFile] Hi-C contact count data in BEDPE format
 ```
 
 **(ii) Calculate FDR and filter significant interactions**
 
 ```
-python NCHG_fdr_oddratio_calc.py sample_50kb.domain.RAW.no_cen.NCHG.out fdr_bh 2 0.01 > sample_50kb.domain.RAW.no_cen.NCHG.sigDESCRIPTION:python NCHG_fdr_oddratio_calc.py [inputFile] [testMethod] [cutoff] [threshold][inputFile] Input filename (NCHG output; BEDPE format)[testMethod] Multiple hypothesis testing method (bonferroni, sidak, holm-sidak, holm, simes-hochberg, hommel, fdr_bh, fdr_by, fdr_tsbh, fdr_tsbky)[cutoff] Odds ratio cutoff value[threshold] Significance threshold value after multiple testing correction```
+python NCHG_fdr_oddratio_calc.py sample_50kb.domain.RAW.no_cen.NCHG.out fdr_bh 2 0.01 > sample_50kb.domain.RAW.no_cen.NCHG.sig
+
+DESCRIPTION:
+python NCHG_fdr_oddratio_calc.py [inputFile] [testMethod] [cutoff] [threshold]
+
+[inputFile] Input filename (NCHG output; BEDPE format)
+[testMethod] Multiple hypothesis testing method (bonferroni, sidak, holm-sidak, holm, simes-hochberg, hommel, fdr_bh, fdr_by, fdr_tsbh, fdr_tsbky)
+[cutoff] Odds ratio cutoff value
+[threshold] Significance threshold value after multiple testing correction
+```
 
 ---
 
@@ -175,8 +202,13 @@ A Model Setup File (GTrack) is the input file to the Chrom3D which specifies the
 
 ```
 bash make_gtrack.sh sample_50kb.domain.RAW.no_cen.NCHG.sig sample_Arrowhead_domainlist.domains sample_intra_chromosome.gtrack
-DESCRIPTION:bash make_gtrack.sh [sigFile] [domainFile] [outputFile]
-[sigFile] Intra-chromosome significant interactions file[domainFile] Domain file[outputFile] Output GTrack file (Model Setup File)
+
+DESCRIPTION:
+bash make_gtrack.sh [sigFile] [domainFile] [outputFile]
+
+[sigFile] Intra-chromosome significant interactions file
+[domainFile] Domain file
+[outputFile] Output GTrack file (Model Setup File)
 
 ```
 
@@ -185,27 +217,55 @@ bash make_gtrack.sh sample_50kb.domain.RAW.no_cen.NCHG.sig sample_Arrowhead_doma
 This step will add the periphery column to the GTrack file (specifying beads with periphery constrains). Please refer the [illustration]().    
 
 ```
-bash make_gtrack_incl_lad.sh sample_intra_chromosome.gtrack sample_LAD.bed sample_intra_chromosome_w_LADs.gtrackDESCRIPTION:bash make_gtrack_incl_lad.sh [inputFile] [ladFile] [outputFile][inputFile] Input GTrack file (without LAD information)[ladFile] LAD BED file to be added to GTrack file[outputFile] Output GTrack file with LAD information added 
+bash make_gtrack_incl_lad.sh sample_intra_chromosome.gtrack sample_LAD.bed sample_intra_chromosome_w_LADs.gtrack
+
+DESCRIPTION:
+bash make_gtrack_incl_lad.sh [inputFile] [ladFile] [outputFile]
+
+[inputFile] Input GTrack file (without LAD information)
+[ladFile] LAD BED file to be added to GTrack file
+[outputFile] Output GTrack file with LAD information added 
 ```
 
 **(iii) Prepare inter-chromosomal Hi-C interaction counts**
 
 ```
 bash ./interchr_NCHG_input_auto.sh chrom.sizes.sorted unmappable_blacklist.bed 1mb > sample_1mb_inter.bedpe
-DESCRIPTION:bash interchr_NCHG_input_auto.sh [chromSizeFile] [blackList] [resolution][chromSizeFile] Text file containing the chromosome sizes (sorted numerically)[blackList] BED file containing positions of blacklisted regions[resolution] Resolution of the interaction matrix as given in the matrix filename (e.g. 50kb or 1mb)```
+
+DESCRIPTION:
+bash interchr_NCHG_input_auto.sh [chromSizeFile] [blackList] [resolution]
+
+[chromSizeFile] Text file containing the chromosome sizes (sorted numerically)
+[blackList] BED file containing positions of blacklisted regions
+[resolution] Resolution of the interaction matrix as given in the matrix filename (e.g. 50kb or 1mb)
+```
 
 **(iv) Call significant inter-chromosomal interactions**
 
 ```
-NCHG -i -p sample_1mb_inter.bedpe > sample_1mb_inter_chr.NCHG.outDESCRIPTION:NCHG -i [NULL] -p [NULL] [inputFile] > [outputFile]-i Instructs NCHG to use inter-chromosomal interactions 
--p Instructs NCHG to print output to stdout [inputFile] Hi-C contact count data (BEDPE format)[outputFile] File containing P-values for each TAD pair
+NCHG -i -p sample_1mb_inter.bedpe > sample_1mb_inter_chr.NCHG.out
+
+DESCRIPTION:
+NCHG -i [NULL] -p [NULL] [inputFile] > [outputFile]
+
+-i Instructs NCHG to use inter-chromosomal interactions 
+-p Instructs NCHG to print output to stdout [inputFile] Hi-C contact count data (BEDPE format)
+[outputFile] File containing P-values for each TAD pair
 ```
 
 **(v) Calculate FDR and filter significant interactions**
 
 ```
 python NCHG_fdr_oddratio_calc.py sample_1mb_inter_chr.NCHG.out fdr_bh 2 0.01 > sample_1mb_inter_chr.NCHG.sig
-DESCRIPTION:python NCHG_fdr_oddratio_calc.py [inputFile] [testMethod] [cutoff] [threshold][inputFile] Input filename (NCHG output; BEDPE format)[testMethod] Multiple hypothesis testing method (bonferroni, sidak, holm-sidak, holm, simes-hochberg, hommel, fdr_bh, fdr_by, fdr_tsbh, fdr_tsbky)[cutoff] Odds ratio cutoff value[threshold] Significance threshold value after multiple testing correction
+
+DESCRIPTION:
+python NCHG_fdr_oddratio_calc.py [inputFile] [testMethod] [cutoff] [threshold]
+
+[inputFile] Input filename (NCHG output; BEDPE format)
+[testMethod] Multiple hypothesis testing method (bonferroni, sidak, holm-sidak, holm, simes-hochberg, hommel, fdr_bh, fdr_by, fdr_tsbh, fdr_tsbky)
+[cutoff] Odds ratio cutoff value
+[threshold] Significance threshold value after multiple testing correction
+
 ```
 
 **(vi) Add significant inter-chromosomal interaction information to the GTrack**
@@ -213,7 +273,15 @@ python NCHG_fdr_oddratio_calc.py sample_1mb_inter_chr.NCHG.out fdr_bh 2 0.01 > s
 This step adds siginificant inter-chromosomal interaction to the edge column of the Gtrack file. 
 
 ```
-bash add_inter_chrom_beads.sh sample_intra_chromosome_w_LADs.gtrack sample_1mb_inter_chr.NCHG.sig sample_inter_intra_chr_w_LADs.gtrackDESCRIPTION:bash add_inter_chrom_beads.sh [inputFile] [sigFile] [outFile][inputFile] Input GTrack file[sigFile] Inter-chromosome significant interaction file[outFile] Output GTrack file containing significant inter-chromosomal interactions
+
+bash add_inter_chrom_beads.sh sample_intra_chromosome_w_LADs.gtrack sample_1mb_inter_chr.NCHG.sig sample_inter_intra_chr_w_LADs.gtrack
+
+DESCRIPTION:
+bash add_inter_chrom_beads.sh [inputFile] [sigFile] [outFile]
+
+[inputFile] Input GTrack file
+[sigFile] Inter-chromosome significant interaction file
+[outFile] Output GTrack file containing significant inter-chromosomal interactions
 ```
 
 **(vii) Modify the Model Setup File to make a diploid model**
@@ -221,8 +289,12 @@ This step adds siginificant inter-chromosomal interaction to the edge column of 
 
 ```
 python make_diploid_gtrack.py sample_inter_intra_chr_w_LADs.gtrack > sample_inter_intra_chr_w_LADs.diploid.gtrack
-DESCRIPTION:python make_diploid_gtrack.py [inputFile] > [outputFile]
-[inputFile] Input GTrack file with constraints specified for single chromosomes[outputFile] Output GTrack file with constraints for each chromosome copy
+
+DESCRIPTION:
+python make_diploid_gtrack.py [inputFile] > [outputFile]
+
+[inputFile] Input GTrack file with constraints specified for single chromosomes
+[outputFile] Output GTrack file with constraints for each chromosome copy
 ```
 
 ---
@@ -230,22 +302,39 @@ python make_diploid_gtrack.py sample_inter_intra_chr_w_LADs.gtrack > sample_inte
 ### Run Chrom3D to generate 3D genome models
 
 ```
-Chrom3D -y 0.15 -r 5.0 -n 2000000 -o sample_inter_intra_chr_w_LADs.diploid.cmm sample_inter_intra_chr_w_LADs.diploid.gtrackDESCRIPTION:Chrom3D -y [scale] -r [radius] -n [iterations] -o [outputFile] [setupFile]
--y Scale total volume of the model beads relative to the volume of the nucleus
--r Radius of the nucleus in micrometers-n Number of iterations-o Output filename[setupFile] Model Setup File in GTrack format
+Chrom3D -y 0.15 -r 5.0 -n 2000000 -o sample_inter_intra_chr_w_LADs.diploid.cmm sample_inter_intra_chr_w_LADs.diploid.gtrack
+
+DESCRIPTION:
+Chrom3D -y [scale] -r [radius] -n [iterations] -o [outputFile] [setupFile]
+
+-y Scale total volume of the model beads relative to the volume of the nucleus
+-r Radius of the nucleus in micrometers
+-n Number of iterations
+-o Output filename
+[setupFile] Model Setup File in GTrack format
 ```
 ---
 
 ### Visualisation of 3D genome models using chimera
 
 `
-chimera sample_inter_intra_chr_w_LADs.diploid.cmm`
+chimera sample_inter_intra_chr_w_LADs.diploid.cmm
+`
 
 **Highlighting LAD-containing beads**
 
 
 ```
-python color_beads.py sample_inter_intra_chr_w_LADs.diploid.cmm lad_ad04.ids 0,0,255 override > sample_inter_intra_chr_w_LADs.diploid.visLAD.cmmDESCRIPTION:python color_beads.py [inputFile] [beadIdFile] [color] [colorScheme][inputFile] Input CMM file[beadIdFile] File containing selected bead ids[color] Comma-separated RGB value[colorScheme] ‘blend’ or ‘override’ color of the beads specified 
+python color_beads.py sample_inter_intra_chr_w_LADs.diploid.cmm lad_ad04.ids 0,0,255 override > sample_inter_intra_chr_w_LADs.diploid.visLAD.cmm
+
+DESCRIPTION:
+python color_beads.py [inputFile] [beadIdFile] [color] [colorScheme]
+
+[inputFile] Input CMM file
+[beadIdFile] File containing selected bead ids
+[color] Comma-separated RGB value
+[colorScheme] ‘blend’ or ‘override’ color of the beads specified
+ 
 ```
 
 **Highlighting HiC constrained beads and visualisation**
@@ -260,7 +349,9 @@ python color_beads.py sample_inter_intra_chr_w_LADs.diploid.visLAD.cmm TAD_inter
 chimera sample_inter_intra_chr_w_LADs.diploid.visLADCons.cmm
 ```
 
+
 ##Simple illustration of a Model Setup File 
+
 
 ![Example GTrack](http://folk.uio.no/tmali/git_ups/gtrack_illust.png)
 
